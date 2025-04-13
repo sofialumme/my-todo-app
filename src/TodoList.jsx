@@ -5,11 +5,13 @@ import DeleteIcon from "@mui/icons-material/Delete";
 const TodoList = () => {
   const [tasks, setTasks] = useState([]);
   const [input, setInput] = useState("");
+  const [date, setDate] = useState("");
 
   const addTask = () => {
-    if (input.trim()) {
-      setTasks([...tasks, { id: Date.now(), text: input, done: false }]);
+    if (input.trim() && date) {
+      setTasks([...tasks, { id: Date.now(), text: input, date: date, done: false }]);
       setInput("");
+      setDate("");
     }
   };
 
@@ -30,12 +32,19 @@ const TodoList = () => {
       <Typography variant="h4" gutterBottom>
         Todo List
       </Typography>
-      <Box sx={{ display: "flex", gap: 2, mb: 3 }}>
+      <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mb: 3 }}>
         <TextField
           fullWidth
           value={input}
           onChange={(e) => setInput(e.target.value)}
           label="Add a new task"
+        />
+        <TextField
+          type="date"
+          value={date}
+          onChange={(e) => setDate(e.target.value)}
+          InputLabelProps={{ shrink: true }}
+          label="Due Date"
         />
         <Button variant="contained" onClick={addTask}>
           Add
@@ -45,15 +54,20 @@ const TodoList = () => {
         {tasks.map((task) => (
           <Card key={task.id} variant="outlined">
             <CardContent sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                <Checkbox
-                  checked={task.done}
-                  onChange={() => toggleTask(task.id)}
-                />
-                <Typography
-                  sx={{ textDecoration: task.done ? "line-through" : "none", color: task.done ? "text.secondary" : "text.primary" }}
-                >
-                  {task.text}
+              <Box sx={{ display: "flex", flexDirection: "column" }}>
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                  <Checkbox
+                    checked={task.done}
+                    onChange={() => toggleTask(task.id)}
+                  />
+                  <Typography
+                    sx={{ textDecoration: task.done ? "line-through" : "none", color: task.done ? "text.secondary" : "text.primary" }}
+                  >
+                    {task.text}
+                  </Typography>
+                </Box>
+                <Typography variant="body2" color="text.secondary">
+                  Due: {task.date}
                 </Typography>
               </Box>
               <IconButton color="error" onClick={() => deleteTask(task.id)}>
