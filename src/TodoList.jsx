@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button, Checkbox, TextField, Typography, Card, CardContent, IconButton, Box } from "@mui/material";
+import { Button, Checkbox, TextField, Typography, Card, CardContent, IconButton, Box, MenuItem, Select, InputLabel, FormControl } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
@@ -10,12 +10,23 @@ const TodoList = () => {
   const [tasks, setTasks] = useState([]);
   const [input, setInput] = useState("");
   const [date, setDate] = useState(null);
+  const [priority, setPriority] = useState("Medium");
 
   const addTask = () => {
     if (input.trim() && date) {
-      setTasks([...tasks, { id: Date.now(), text: input, date: date.format('YYYY-MM-DD'), done: false }]);
+      setTasks([
+        ...tasks,
+        {
+          id: Date.now(),
+          text: input,
+          date: date.format('YYYY-MM-DD'),
+          priority: priority,
+          done: false,
+        },
+      ]);
       setInput("");
       setDate(null);
+      setPriority("Medium");
     }
   };
 
@@ -50,6 +61,19 @@ const TodoList = () => {
             onChange={(newDate) => setDate(newDate)}
             slotProps={{ textField: { fullWidth: true } }}
           />
+          <FormControl fullWidth>
+            <InputLabel id="priority-label">Priority</InputLabel>
+            <Select
+              labelId="priority-label"
+              value={priority}
+              label="Priority"
+              onChange={(e) => setPriority(e.target.value)}
+            >
+              <MenuItem value="Low">Low</MenuItem>
+              <MenuItem value="Medium">Medium</MenuItem>
+              <MenuItem value="High">High</MenuItem>
+            </Select>
+          </FormControl>
           <Button variant="contained" onClick={addTask}>
             Add
           </Button>
@@ -72,6 +96,12 @@ const TodoList = () => {
                   </Box>
                   <Typography variant="body2" color="text.secondary">
                     Due: {task.date}
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    sx={{ color: task.priority === "High" ? "error.main" : "text.secondary" }}
+                  >
+                    Priority: {task.priority}
                   </Typography>
                 </Box>
                 <IconButton color="error" onClick={() => deleteTask(task.id)}>
