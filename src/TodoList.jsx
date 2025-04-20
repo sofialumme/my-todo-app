@@ -4,6 +4,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { DataGrid } from '@mui/x-data-grid';
 import dayjs from 'dayjs';
 
 const TodoList = () => {
@@ -42,6 +43,33 @@ const TodoList = () => {
     setTasks(tasks.filter((task) => task.id !== id));
   };
 
+  const columns = [
+    { field: 'text', headerName: 'Task', flex: 1 },
+    {
+      field: 'date',
+      headerName: 'Due Date',
+      flex: 1,
+      type: 'date',
+      valueGetter: (value, row) => new Date(row.date)
+    },
+    {
+      field: 'priority',
+      headerName: 'Priority',
+      flex: 1,
+      renderCell: (params) => (
+        <Typography color={params.value === 'High' ? 'error.main' : 'text.primary'}>
+          {params.value}
+        </Typography>
+      )
+    },
+    {
+      field: 'done',
+      headerName: 'Done',
+      type: 'boolean',
+      flex: 0.5
+    }
+  ];
+
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <Box sx={{ maxWidth: 500, mx: "auto", mt: 5, p: 2 }}>
@@ -78,7 +106,7 @@ const TodoList = () => {
             Add
           </Button>
         </Box>
-        <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mb: 3 }}>
           {tasks.map((task) => (
             <Card key={task.id} variant="outlined">
               <CardContent sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
@@ -110,6 +138,18 @@ const TodoList = () => {
               </CardContent>
             </Card>
           ))}
+        </Box>
+        <Typography variant="h6" gutterBottom>Task Table</Typography>
+        <Box sx={{ height: 400 }}>
+          <DataGrid
+            rows={tasks}
+            columns={columns}
+            pageSize={5}
+            rowsPerPageOptions={[5, 10]}
+            checkboxSelection
+            disableRowSelectionOnClick
+            getRowId={(row) => row.id}
+          />
         </Box>
       </Box>
     </LocalizationProvider>
