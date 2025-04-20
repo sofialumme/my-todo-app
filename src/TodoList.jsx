@@ -1,11 +1,22 @@
 import React, { useState } from "react";
-import { Button, Checkbox, TextField, Typography, Card, CardContent, IconButton, Box, MenuItem, Select, InputLabel, FormControl } from "@mui/material";
+import {
+  Button,
+  TextField,
+  Typography,
+  Box,
+  MenuItem,
+  Select,
+  InputLabel,
+  FormControl,
+  IconButton,
+  Checkbox
+} from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { DataGrid } from '@mui/x-data-grid';
-import dayjs from 'dayjs';
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { DataGrid } from "@mui/x-data-grid";
+import dayjs from "dayjs";
 
 const TodoList = () => {
   const [tasks, setTasks] = useState([]);
@@ -20,10 +31,10 @@ const TodoList = () => {
         {
           id: Date.now(),
           text: input,
-          date: date.format('YYYY-MM-DD'),
+          date: date.toISOString(),
           priority: priority,
-          done: false,
-        },
+          done: false
+        }
       ]);
       setInput("");
       setDate(null);
@@ -44,35 +55,66 @@ const TodoList = () => {
   };
 
   const columns = [
-    { field: 'text', headerName: 'Task', flex: 1 },
     {
-      field: 'date',
-      headerName: 'Due Date',
-      flex: 1,
-      type: 'date',
-      valueGetter: (value, row) => new Date(row.date)
-    },
-    {
-      field: 'priority',
-      headerName: 'Priority',
+      field: "text",
+      headerName: "Task",
       flex: 1,
       renderCell: (params) => (
-        <Typography color={params.value === 'High' ? 'error.main' : 'text.primary'}>
-          {params.value}
+        <Typography
+          sx={{
+            textDecoration: params.row.done ? "line-through" : "none",
+            color: params.row.done ? "text.secondary" : "text.primary"
+          }}
+        >
+          {params.row.text}
         </Typography>
       )
     },
     {
-      field: 'done',
-      headerName: 'Done',
-      type: 'boolean',
-      flex: 0.5
+      field: "date",
+      headerName: "Due Date",
+      flex: 1,
+      type: "date",
+      valueGetter: (value, row) => new Date(row.date)
+    },
+    {
+      field: "priority",
+      headerName: "Priority",
+      flex: 1,
+      renderCell: (params) => (
+        <Typography color={params.row.priority === "High" ? "error.main" : "text.primary"}>
+          {params.row.priority}
+        </Typography>
+      )
+    },
+    {
+      field: "done",
+      headerName: "Done",
+      width: 100,
+      renderCell: (params) => (
+        <Checkbox
+          checked={params.row.done}
+          onChange={() => toggleTask(params.row.id)}
+        />
+      )
+    },
+    {
+      field: "actions",
+      headerName: "Actions",
+      width: 100,
+      sortable: false,
+      filterable: false,
+      renderCell: (params) => (
+        <IconButton color="error" onClick={() => deleteTask(params.row.id)}>
+          <DeleteIcon />
+        </IconButton>
+      )
     }
   ];
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <Box sx={{ maxWidth: 500, mx: "auto", mt: 5, p: 2 }}>
+      <Box sx={{ maxWidth: 700, mx: "auto", mt: 5, p: 2 }}>
         <Typography variant="h4" gutterBottom>
           Todo List
         </Typography>
@@ -106,49 +148,16 @@ const TodoList = () => {
             Add
           </Button>
         </Box>
-        <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mb: 3 }}>
-          {tasks.map((task) => (
-            <Card key={task.id} variant="outlined">
-              <CardContent sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                <Box sx={{ display: "flex", flexDirection: "column" }}>
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                    <Checkbox
-                      checked={task.done}
-                      onChange={() => toggleTask(task.id)}
-                    />
-                    <Typography
-                      sx={{ textDecoration: task.done ? "line-through" : "none", color: task.done ? "text.secondary" : "text.primary" }}
-                    >
-                      {task.text}
-                    </Typography>
-                  </Box>
-                  <Typography variant="body2" color="text.secondary">
-                    Due: {task.date}
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    sx={{ color: task.priority === "High" ? "error.main" : "text.secondary" }}
-                  >
-                    Priority: {task.priority}
-                  </Typography>
-                </Box>
-                <IconButton color="error" onClick={() => deleteTask(task.id)}>
-                  <DeleteIcon />
-                </IconButton>
-              </CardContent>
-            </Card>
-          ))}
-        </Box>
         <Typography variant="h6" gutterBottom>Task Table</Typography>
-        <Box sx={{ height: 400 }}>
+        <Box sx={{ height: 500 }}>
           <DataGrid
             rows={tasks}
             columns={columns}
             pageSize={5}
             rowsPerPageOptions={[5, 10]}
-            checkboxSelection
             disableRowSelectionOnClick
             getRowId={(row) => row.id}
+            checkboxSelection={false}
           />
         </Box>
       </Box>
