@@ -5,10 +5,7 @@ import {
   IconButton,
   MenuItem,
   Stack,
-  Tab,
-  Tabs,
   TextField,
-  Typography,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { DataGrid } from "@mui/x-data-grid";
@@ -19,22 +16,11 @@ import dayjs from "dayjs";
 
 const priorityOptions = ["Low", "Medium", "High"];
 
-function TabPanel({ children, value, index }) {
-  return (
-    <div role="tabpanel" hidden={value !== index}>
-      {value === index && <Box sx={{ pt: 2 }}>{children}</Box>}
-    </div>
-  );
-}
-
-const TodoList = () => {
-  const [tabIndex, setTabIndex] = useState(0);
+const TasksTab = () => {
   const [tasks, setTasks] = useState([]);
   const [input, setInput] = useState("");
   const [date, setDate] = useState(null);
   const [priority, setPriority] = useState("Medium");
-
-  const handleTabChange = (_, newValue) => setTabIndex(newValue);
 
   const addTask = () => {
     if (input.trim() && date) {
@@ -130,69 +116,50 @@ const TodoList = () => {
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <Box sx={{ maxWidth: 900, mx: "auto", mt: 5 }}>
-        <Tabs value={tabIndex} onChange={handleTabChange} centered>
-          <Tab label="Home" />
-          <Tab label="Tasks" />
-        </Tabs>
+      <Stack spacing={2} direction="row" sx={{ mb: 3 }}>
+        <TextField
+          label="New Task"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          fullWidth
+        />
+        <DatePicker
+          label="Due Date"
+          value={date}
+          onChange={(newDate) => setDate(newDate)}
+        />
+        <TextField
+          select
+          label="Priority"
+          value={priority}
+          onChange={(e) => setPriority(e.target.value)}
+          sx={{ minWidth: 120 }}
+        >
+          {priorityOptions.map((level) => (
+            <MenuItem key={level} value={level}>
+              {level}
+            </MenuItem>
+          ))}
+        </TextField>
+        <Button variant="contained" onClick={addTask}>
+          Add
+        </Button>
+      </Stack>
 
-        <TabPanel value={tabIndex} index={0}>
-          <Typography variant="h4" gutterBottom>
-            Welcome to the Todo App!
-          </Typography>
-          <Typography variant="body1">
-            Use the Tasks tab to manage your to-do list with priority, due dates,
-            and completion tracking.
-          </Typography>
-        </TabPanel>
-
-        <TabPanel value={tabIndex} index={1}>
-          <Stack spacing={2} direction="row" sx={{ mb: 3 }}>
-            <TextField
-              label="New Task"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              fullWidth
-            />
-            <DatePicker
-              label="Due Date"
-              value={date}
-              onChange={(newDate) => setDate(newDate)}
-            />
-            <TextField
-              select
-              label="Priority"
-              value={priority}
-              onChange={(e) => setPriority(e.target.value)}
-              sx={{ minWidth: 120 }}
-            >
-              {priorityOptions.map((level) => (
-                <MenuItem key={level} value={level}>
-                  {level}
-                </MenuItem>
-              ))}
-            </TextField>
-            <Button variant="contained" onClick={addTask}>
-              Add
-            </Button>
-          </Stack>
-
-          <div style={{ height: 500, width: "100%" }}>
-            <DataGrid
-              rows={tasks}
-              columns={columns}
-              disableRowSelectionOnClick
-              pageSizeOptions={[5, 10]}
-              initialState={{
-                pagination: { paginationModel: { pageSize: 5, page: 0 } },
-                sorting: { sortModel: [{ field: "date", sort: "asc" }] },
-              }}
-            />
-          </div>
-        </TabPanel>
-      </Box>
+      <div style={{ height: 500, width: "100%" }}>
+        <DataGrid
+          rows={tasks}
+          columns={columns}
+          disableRowSelectionOnClick
+          pageSizeOptions={[5, 10]}
+          initialState={{
+            pagination: { paginationModel: { pageSize: 5, page: 0 } },
+            sorting: { sortModel: [{ field: "date", sort: "asc" }] },
+          }}
+        />
+      </div>
     </LocalizationProvider>
   );
 };
 
-export default TodoList;
+export default TasksTab;
